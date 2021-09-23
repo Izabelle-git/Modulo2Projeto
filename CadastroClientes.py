@@ -3,8 +3,47 @@ from tkinter import ttk
 from cep import *
 import sqlite3
 import re
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.platypus import SimpleDocTemplate, Image
+import webbrowser
 
 janela = Tk()
+
+#Adicionando uma classe para geração de relatorios
+class Relatorios():
+    def printCliente(self):
+        webbrowser.open("cliente.pdf")
+    
+    def gerarRelatorio(self):
+        self.c = canvas.Canvas("cliente.pdf")  
+        self.codigoRel = self.entry_codigo.get()
+        self.nomeRel = self.entry_nome.get()
+        self.cidadeRel = self.entry_cidade.get()
+        self.telefoneRel = self.entry_telefone.get()
+
+        self.c.setFont("Helvetica-Bold", 24)
+        self.c.drawString(200, 790, 'Ficha do Cliente')
+
+        self.c.setFont("Helvetica-Bold", 14)
+        self.c.drawString(50, 700, 'Codigo ')
+        self.c.drawString(50, 680, 'Nome: ')
+        self.c.drawString(50, 640, 'Cidade: ')
+        self.c.drawString(50, 660, 'Telefone: ')
+
+        self.c.setFont("Helvetica-Bold", 14)
+        self.c.drawString(105, 700, self.codigoRel)
+        self.c.drawString(100, 680, self.nomeRel)
+        self.c.drawString(110, 640, self.cidadeRel)
+        self.c.drawString(120, 660, self.telefoneRel)
+
+        self.c.rect(20, 550, 1, fill=True, stroke=False)
+
+        self.c.showPage()
+        self.c.save()
+        self.printCliente()
 
 #Adicionando validadores nas entrys
 class Validadores():
@@ -149,7 +188,7 @@ class Funcs():
             col1, col2, col3, col4 = self.listaCli.item(n, 'values')
             self.entry_codigo.insert(END, col1)
             self.entry_nome.insert(END, col2)
-            self.entry_telefone(END, col3)
+            self.entry_telefone.insert(END, col3)
             self.entry_cidade.insert(END, col4)
 
     def deleta_cliente(self):
@@ -161,6 +200,15 @@ class Funcs():
         self.limpa_tela()
         self.select_lista()
 
+    def altera_cliente(self):
+        self.dados()
+        self.conecta_bd()
+        self.cursor.execute(""" UPDATE clientes SET nome_cliente = ?, telefone = ?, cidade = ? WHERE cod = ? """, (self.nome, self.telefone, self.cidade, self.codigo))
+        self.conn.commit()
+        self.desconecta_bd()
+        self.select_lista()
+        self.limpa_tela()
+        
     def busca_cliente(self):
         self.conecta_bd()
         self.listaCli.delete(*self.listaCli.get_children()) #limpa a lista
@@ -179,7 +227,7 @@ class Funcs():
         self.desconecta_bd()   
         
 
-class App(Funcs):
+class App(Funcs, Relatorios):
     def __init__(self):
         self.janela = janela
         self.tela() #chamando a funçao tela
@@ -188,6 +236,7 @@ class App(Funcs):
         self.lista_frame2() #chamando a tabela Clientes
         self.montaTabelas() #chamando a função monta tabelas
         self.select_lista() #chamando para atualizar a lista com o clientes cadastrados
+        self.menus() #chamando a função mostrar Menu
         janela.mainloop()
 
     def tela(self):
@@ -211,7 +260,7 @@ class App(Funcs):
     ##Criando Botões##  
         #Criando o Botão Limpar
         self.btn_limpar = Button(self.frame_1, text='Limpar', bd=2, bg='#107db2', fg='white',
-                                font=('verdana', 8, 'bold'), command=self.limpa_tela)
+                                font=('verdana', 8, 'bold'), command = self.limpa_tela)
         self.btn_limpar.place(relx=0.8, rely=0.25, relwidth=0.1, relheight=0.15)
 
         #Criando o Botão Buscar
@@ -227,17 +276,17 @@ class App(Funcs):
 
         #Criando o Botão Alterar
         self.btn_alterar = Button(self.frame_1, text='Alterar', bd=2, bg='#107db2', fg='white',
-                                 font=('verdana', 8, 'bold'))
+                                 font=('verdana', 8, 'bold'), command = self.altera_cliente)
         self.btn_alterar.place(relx=0.8, rely=0.1, relwidth=0.1, relheight=0.15)
 
         #Criando o Botão Deletar
         self.btn_deletar = Button(self.frame_1, text='DELETAR', bd=2, bg='#DC143C', fg='white',
-                                font=('verdana', 8, 'bold'), command=self.deleta_cliente)
+                                font=('verdana', 8, 'bold'), command = self.deleta_cliente)
         self.btn_deletar.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
 
     ##Criando Labels e Entrys##       
         #Criando Label e Entry Código
-        self.lb_codigo = Label(self.frame_1, text='ID', bg='#dfe3ee', fg='#107db2')
+        self.lb_codigo = Label(self.frame_1, text='Código', bg='#dfe3ee', fg='#107db2')
         self.lb_codigo.place(relx=0.0455, rely=0.13)
 
         self.entry_codigo = Entry(self.frame_1)
@@ -310,7 +359,7 @@ class App(Funcs):
     ##Criando a tabela Clientes    
         self.listaCli = ttk.Treeview(self.frame_2, height=3, columns=('col1', 'col2', 'col3', 'col4'))
         self.listaCli.heading('#0', text='')
-        self.listaCli.heading('#1', text='ID')
+        self.listaCli.heading('#1', text='Código')
         self.listaCli.heading('#2', text='Nome')
         self.listaCli.heading('#3', text='Telefone')
         self.listaCli.heading('#4', text='Cidade')
@@ -330,5 +379,20 @@ class App(Funcs):
         self.listaCli.bind("<Double-1>", self.OnDoubleClick)
         style=ttk.Style(janela)
         style.theme_use('clam')
+    #Criando a barra com menu de opções
+    def menus(self):
+        menubar = Menu(self.janela)
+        self.janela.config(menu=menubar)
+        menu1 = Menu(menubar)
+        menu2 = Menu(menubar)
 
+        def Quit(): self.janela.destroy()
+
+        menubar.add_cascade(label= "Opções", menu = menu1)
+        menubar.add_cascade(label= "Relatorios", menu = menu2)
+
+        menu1.add_command(label= "Sair", command = Quit)
+        menu1.add_command(label= "Limpa Cliente", command = self.limpa_tela)
+        
+        menu2.add_command(label= "Clientes", command = self.gerarRelatorio)
 App()
