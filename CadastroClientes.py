@@ -1,6 +1,5 @@
 from tkinter import *
 from tkinter import ttk
-from cep import *
 import sqlite3
 import re
 from reportlab.pdfgen import canvas
@@ -21,25 +20,41 @@ class Relatorios():
         self.c = canvas.Canvas("cliente.pdf")  
         self.codigoRel = self.entry_codigo.get()
         self.nomeRel = self.entry_nome.get()
+        self.cpfRel = self.entry_cpf.get()
+        self.cepRel = self.entry_cep.get()
         self.cidadeRel = self.entry_cidade.get()
+        self.nibge = self.entry_nibge.get()
+        self.uf = self.entry_uf.get()
+        self.logradouro = self.entry_logradouro.get()
+        self.numero = self.entry_numero.get()
         self.telefoneRel = self.entry_telefone.get()
 
         self.c.setFont("Helvetica-Bold", 24)
         self.c.drawString(200, 790, 'Ficha do Cliente')
 
+        #Criando os campos na ficha
         self.c.setFont("Helvetica-Bold", 14)
         self.c.drawString(50, 700, 'Codigo ')
         self.c.drawString(50, 680, 'Nome: ')
-        self.c.drawString(50, 640, 'Cidade: ')
-        self.c.drawString(50, 660, 'Telefone: ')
+        self.c.drawString(50, 660, 'CPF: ')
+        self.c.drawString(50, 640, 'CEP: ')
+        self.c.drawString(50, 620, 'Cidade: ')
+        self.c.drawString(50, 600, 'Nº IBGE: ')
+        self.c.drawString(50, 580, 'UF: ')
+        self.c.drawString(50, 560, 'Logradouro: ')
+        self.c.drawString(50, 540, 'Número: ')
+        self.c.drawString(50, 520, 'Telefone: ')
 
+        #Chamando os dados de acordo com a entry do banco
         self.c.setFont("Helvetica-Bold", 14)
         self.c.drawString(105, 700, self.codigoRel)
         self.c.drawString(100, 680, self.nomeRel)
         self.c.drawString(110, 640, self.cidadeRel)
         self.c.drawString(120, 660, self.telefoneRel)
+        ###LEMBRAR DE ADICIONAR MAIS COISA AQUI
 
-        self.c.rect(20, 550, 1, fill=True, stroke=False)
+        #Um detalhe a mais para deixa a ficha bonita
+        self.c.rect(185, 780, 215, 35, fill=False, stroke=True)
 
         self.c.showPage()
         self.c.save()
@@ -55,7 +70,7 @@ class Validadores():
             value = int(text)
         except ValueError:
             return False
-        return 0 <= value <= 10000 #Os 0 do são o número de caracteres
+        return 0 <= value <= 100000 #Os 0 do são o número de caracteres
 
     def validarNum(self, text): #Limite de 9 caracteres
         if text == '':
@@ -141,6 +156,12 @@ class Funcs():
             CREATE TABLE IF NOT EXISTS clientes(
              cod INTEGER PRIMARY KEY,
              nome_cliente CHAR(40) NOT NULL,
+             cpf INTEGER(11) NOT NULL,
+             cep INTEGER(9),
+             ibge INTEGER(7),
+             uf CHAR(2) NOT NULL,
+             logradouro CHAR(40),
+             numero INTEGER(5),
              telefone INTEGER(20),
              cidade CHAR(40)
             );
@@ -149,23 +170,26 @@ class Funcs():
         self.conn.commit(); print('Banco de Dados criado')
         #Desconectar o banco de dados
         self.desconecta_bd(); print('Banco de Dados Desconectado')
+
 #Função que possui todas as variaveis
     def dados(self):
         self.codigo = self.entry_codigo.get()
         self.nome = self.entry_nome.get()
+        self.cpf = self.entry_cpf.get()
         self.cep = self.entry_cep.get()
         self.cidade = self.entry_cidade.get()
         self.nibge = self.entry_nibge.get()
         self.uf = self.entry_uf.get()
         self.logradouro = self.entry_logradouro.get()
         self.numero = self.entry_numero.get()
-        self.telefone = self.entry_telefone.get()    
+        self.telefone = self.entry_telefone.get()   
+
 #Função para adiconar dados do cliente    
     def add_cliente(self):
         self.dados()
         self.conecta_bd()
-        self.cursor.execute(""" INSERT INTO clientes(nome_cliente, telefone, cidade)
-            VALUES (?, ?, ?)""", (self.nome, self.telefone, self.cidade))
+        self.cursor.execute(""" INSERT INTO clientes(nome_cliente, cpf, cep, ibge, uf, logradouro, numero, telefone, cidade)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""", (self.nome, self.cpf, self.cep, self.nibge, self.uf, self.logradouro, self.numero, self.telefone, self.cidade))
         self.conn.commit()
         self.desconecta_bd()
         self.select_lista()
@@ -174,7 +198,7 @@ class Funcs():
     def select_lista(self):
         self.listaCli.delete(*self.listaCli.get_children())
         self.conecta_bd()
-        lista = self.cursor.execute(""" SELECT cod, nome_cliente, telefone, cidade FROM clientes
+        lista = self.cursor.execute(""" SELECT cod, nome_cliente, cpf, cep, ibge, uf, logradouro, numero, telefone, cidade FROM clientes
             ORDER BY nome_cliente ASC; """)
         for i in lista:
             self.listaCli.insert("", END, values=i) 
@@ -185,11 +209,17 @@ class Funcs():
         self.listaCli.selection()
 
         for n in self.listaCli.selection():
-            col1, col2, col3, col4 = self.listaCli.item(n, 'values')
+            col1, col2, col3, col4, col5, col6, col7, col8, col9, col10 = self.listaCli.item(n, 'values')
             self.entry_codigo.insert(END, col1)
             self.entry_nome.insert(END, col2)
-            self.entry_telefone.insert(END, col3)
-            self.entry_cidade.insert(END, col4)
+            self.entry_cpf.insert(END, col3)
+            self.entry_cep.insert(END, col4)
+            self.entry_cidade.insert(END, col5)
+            self.entry_nibge.insert(END, col6)
+            self.entry_uf.insert(END, col7)
+            self.entry_logradouro.insert(END, col8)
+            self.entry_numero.insert(END, col9)
+            self.entry_telefone.insert(END, col10)
 
     def deleta_cliente(self):
         self.dados()
@@ -203,7 +233,7 @@ class Funcs():
     def altera_cliente(self):
         self.dados()
         self.conecta_bd()
-        self.cursor.execute(""" UPDATE clientes SET nome_cliente = ?, telefone = ?, cidade = ? WHERE cod = ? """, (self.nome, self.telefone, self.cidade, self.codigo))
+        self.cursor.execute(""" UPDATE clientes SET nome_cliente = ?, cpf = ?, cep = ?, ibge = ?, uf = ?, logradouro = ?, numero = ?, telefone = ?, cidade = ? WHERE cod = ? """, (self.nome, self.cpf, self.cep, self.nibge, self.uf, self.logradouro, self.numero, self.telefone, self.cidade))
         self.conn.commit()
         self.desconecta_bd()
         self.select_lista()
@@ -244,7 +274,7 @@ class App(Funcs, Relatorios):
         self.janela.configure(background='#1e3743') #Cor de fundo
         self.janela.geometry('1000x800') #tamanho da tela
         self.janela.resizable(True, True) #tamanho ajustável
-        self.janela.maxsize(width=900, height=700) #tamanho máximo
+        self.janela.maxsize(width=1100, height=900) #tamanho máximo
         self.janela.minsize(width=500, height=400) #tamanho mínimo
 
     def frames_tela(self):
@@ -293,18 +323,18 @@ class App(Funcs, Relatorios):
         self.entry_codigo.place(relx=0.05, rely=0.20, relwidth=0.08)
 
         #Criando Label e Entry Nome
-        self.lb_nome = Label(self.frame_1, text='Nome/Nome Fantasia', bg='#dfe3ee', fg='#107db2')
+        self.lb_nome = Label(self.frame_1, text='Nome', bg='#dfe3ee', fg='#107db2')
         self.lb_nome.place(relx=0.05, rely=0.27)
 
         self.entry_nome = Entry(self.frame_1)
         self.entry_nome.place(relx=0.05, rely=0.34, relwidth=0.3)
 
         #Criando Label e Entry Nome
-        self.lb_cpfcnpj = Label(self.frame_1, text='CPF/CNPJ', bg='#dfe3ee', fg='#107db2')
-        self.lb_cpfcnpj.place(relx=0.38, rely=0.27)
+        self.lb_cpf = Label(self.frame_1, text='CPF', bg='#dfe3ee', fg='#107db2')
+        self.lb_cpf.place(relx=0.38, rely=0.27)
 
-        self.entry_cpfcnpj = Entry(self.frame_1)
-        self.entry_cpfcnpj.place(relx=0.38, rely=0.34, relwidth=0.2)
+        self.entry_cpf = Entry(self.frame_1)
+        self.entry_cpf.place(relx=0.38, rely=0.34, relwidth=0.2)
 
         #Criando Label e Entry CEP
         self.lb_cep = Label(self.frame_1, text='CEP', bg='#dfe3ee', fg='#107db2')
@@ -357,18 +387,30 @@ class App(Funcs, Relatorios):
 
     def lista_frame2(self):
     ##Criando a tabela Clientes    
-        self.listaCli = ttk.Treeview(self.frame_2, height=3, columns=('col1', 'col2', 'col3', 'col4'))
+        self.listaCli = ttk.Treeview(self.frame_2, height=3, columns=('col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9', 'col10'))
         self.listaCli.heading('#0', text='')
         self.listaCli.heading('#1', text='Código')
         self.listaCli.heading('#2', text='Nome')
-        self.listaCli.heading('#3', text='Telefone')
-        self.listaCli.heading('#4', text='Cidade')
+        self.listaCli.heading('#3', text='CPF')
+        self.listaCli.heading('#4', text='CEP')
+        self.listaCli.heading('#5', text='Cidade')
+        self.listaCli.heading('#6', text='IBGE')
+        self.listaCli.heading('#7', text='UF')
+        self.listaCli.heading('#8', text='Logradouro')
+        self.listaCli.heading('#9', text='Número')
+        self.listaCli.heading('#10', text='Telefone')
 
-        self.listaCli.column('#0', width=1)
-        self.listaCli.column('#1', width=50)
-        self.listaCli.column('#2', width=200)
-        self.listaCli.column('#3', width=125)
-        self.listaCli.column('#4', width=125)
+        self.listaCli.column('#0', width=0)
+        self.listaCli.column('#1', width=45)
+        self.listaCli.column('#2', width=150)
+        self.listaCli.column('#3', width=90)
+        self.listaCli.column('#4', width=90)
+        self.listaCli.column('#5', width=80)
+        self.listaCli.column('#6', width=70)
+        self.listaCli.column('#7', width=50)
+        self.listaCli.column('#8', width=125)
+        self.listaCli.column('#9', width=50)
+        self.listaCli.column('#10', width=100)
 
         self.listaCli.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
 
@@ -379,6 +421,7 @@ class App(Funcs, Relatorios):
         self.listaCli.bind("<Double-1>", self.OnDoubleClick)
         style=ttk.Style(janela)
         style.theme_use('clam')
+        
     #Criando a barra com menu de opções
     def menus(self):
         menubar = Menu(self.janela)

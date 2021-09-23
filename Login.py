@@ -1,49 +1,105 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter import messagebox
+import banco
 
-janela = Tk()
+def bt_Sair():
+    login.destroy()
+def criar_Cadastro():
+    # Formulario de Registro
+    cadastrar.place(x=1000)
+    entrar.place(x=1000)
+    estado.place(x=50, y=125)
+    estado_entry.place(x=100, y=125)
+    usuario.place(x=50, y=75)
+    usuario_entry.place(x=100, y=75)
+    senha.place(x=50, y=100)
+    senha_entry.place(x=100, y=100)
+    nome.place(x=50, y=50)
+    nome_entry.place(x=100, y=50)
+    # Base para o SQLite
+    criarcad.place(x=100, y=150)
+    retornar.place(x=100, y=180)
+def retornar_login():
+    # Retorna o necessario
+    usuario.place(x=50, y=50)
+    usuario_entry.place(x=100, y=50)
+    senha.place(x=50, y=75)
+    senha_entry.place(x=100, y=75)
+    cadastrar.place(x=143, y=150)
+    cadastrar.place(x=143, y=150)
+    retornar.place(x=500)
+    entrar.place(x=50, y=150)
+    # Remover o desnecessario
+    nome_entry.place(x=500)
+    nome.place(x=500)
+    estado_entry.place(x=500)
+    estado.place(x=500)
+    criarcad.place(x=500)
+def registrar_Cadastro():
+    # Pegar informações para o Banco
+    NomeBanco = nome_entry.get()
+    UsuarioBanco = usuario_entry.get()
+    SenhaBanco = senha_entry.get()
+    EstadoBanco = estado_entry.get()
 
-class App():
-    def __init__(self):
-        self.janela = janela
-        self.tela() #Chamando a função tela
-        self.widgets_tela() #Chamando Widgets da tela
+    if(NomeBanco == "" and UsuarioBanco == "" and SenhaBanco == "" and EstadoBanco == ""):
+        messagebox.showerror(title="Erro de Registro", message="Preencha todos os Campos")
+    else:
+        # Inserir no Banco
+        banco.cursor.execute("""
+        INSERT INTO Users(Nome, Usuario, Senha, Estado) VALUES(?, ?, ?, ?)
+        """,(NomeBanco, UsuarioBanco, SenhaBanco, EstadoBanco))
+        banco.conn.commit()
+        messagebox.showinfo(title="Register Info", message="Conta criada com sucesso")
+def acessando_Login():
+    EmailLogin = usuario_entry.get()
+    SenhaLogin = senha_entry.get()
 
-        janela.mainloop()
+    banco.cursor.execute("""
+    SELECT * FROM Users
+    WHERE Usuario = ? AND Senha = ?
+    """,(EmailLogin, SenhaLogin))
+    VerificarLogin = banco.cursor.fetchone()
+    try:
+        if(EmailLogin in VerificarLogin and SenhaLogin in VerificarLogin):
+            messagebox.showinfo(title="Login", message="Seja Bem-vindo!")
+    except:
+        messagebox.showinfo(title="Login", message="Não te encontramos: Certifique se está cadastrado no nosso sistema. ")
+login = Tk()
 
-    def tela(self):
-        self.janela.title('LOGIN')  #Título da tela  
-        self.janela.configure(background='#faf9f3')  #Cor de fundo 
-        self.janela.geometry('350x250')  #Tamanho inicial da tela
+corDeFundo= '#0d1e24'
+login.title('LOGIN')
+login["bg"] = corDeFundo
+login.geometry("300x300+100+100")
+login.resizable(width=False, height=False)
+login.iconbitmap(default="Icones_Imagens/icone.ico")
 
-    def widgets_tela(self):
-        #Criando labels e Entrys
-        self.lb_usuario = Label(self.janela, text='Usuário:', bg='#67aeb4', fg='white', font=('arial', 11, 'bold'))
-        self.lb_usuario.place(relx=0.10, rely=0.15)
-        self.usuario_entry = Entry(self.janela)
-        self.usuario_entry.place(relx=0.30, rely=0.15, relwidth=0.5)
+image = PhotoImage(file="Icones_Imagens/imagelogin.png")
+img = Label(login, image=image, bg='#0d1e24')
+img.place(x=110, y=205)
 
-        self.lb_senha = Label(self.janela, text='Senha:', bg='#67aeb4', fg='white', font=('arial', 11, 'bold'))
-        self.lb_senha.place(relx=0.10, rely=0.30)
-        self.senha_entry = Entry(self.janela, show='*')
-        self.senha_entry.place(relx=0.30, rely=0.30, relwidth=0.5)
+title = Label(login, text='LOGIN', bg=corDeFundo, foreground='white')
+title.pack(side=TOP, fill=X)
 
-        #Criando Botões
-        self.bt_cadastrar = Button(self.janela, text='Cadastrar', bd=2, bg='#107db2', fg='white', font=('arial', 11, 'bold'))
-        self.bt_cadastrar.place(relx=0.12, rely=0.50, relwidth=0.25, relheight=0.15)
+usuario = Label(login, text='Usuario:', bg=corDeFundo, foreground='white')
+usuario.place(x=50, y=50)
+usuario_entry = Entry(login)
+usuario_entry.place(x=100, y=50)
+senha = Label(login, text='Senha:', bg=corDeFundo, foreground='white')
+senha.place(x=50, y=75)
+senha_entry = Entry(login, show="•")
+senha_entry.place(x=100, y=75)
 
-        self.bt_entrar = Button(self.janela, text='Entrar', bd=2, bg='#107db2', fg='white', font=('arial', 11, 'bold'))
-        self.bt_entrar.place(relx=0.39, rely=0.50, relwidth=0.20, relheight=0.15)
+entrar = Button(login, width='10', text='ENTRAR', command=acessando_Login)
+entrar.place(x=50, y=150)
+cadastrar = Button(login, width='10', text='CADASTRAR', command=criar_Cadastro)
+cadastrar.place(x=143, y=150)
 
-        self.bt_sair = Button(self.janela, text='Sair', bd=2, bg='#107db2', fg='white', font=('arial', 11, 'bold'))
-        self.bt_sair.place(relx=0.61, rely=0.50, relwidth=0.20, relheight=0.15)
+criarcad = Button(login, width='15', text='CRIAR CADASTRO', command=registrar_Cadastro)
+retornar = Button(login, width='15', text='RETORNAR', command=retornar_login)
+estado = Label(login, text='Estado:', bg='#0d1e24', foreground='white')
+nome = Label(login, text='Nome:', bg='#0d1e24', foreground='white')
+estado_entry = Entry(login)
+nome_entry = Entry(login)
 
-    def verificarCadastro(self):
-        usuario = 'teste'
-        senha = 1234
-
-        if self.usuario_entry.get() == 'admin' and self.senha_entry.get() == '1234':
-            print('Bem vindo')
-        else:
-            print('Dados Incorretos')
-App()    
+login.mainloop()
