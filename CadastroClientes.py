@@ -107,13 +107,13 @@ class Validadores():
         
 ###### Função pra validar as entradas ######### 
 
-def valida_entrada(self):
-    self.val_entry2 = (self.janela.register(self.validar_entry2),'%P')
-    self.val_entryNum = (self.janela.register(self.validarNum),'%P')
-    self.val_entryLet = (self.janela.register(self.validaLetra),'%P')
+    def valida_entrada(self):
+        self.val_entry2 = (self.janela.register(self.validar_entry2),'%P')
+        self.val_entryNum = (self.janela.register(self.validarNum),'%P')
+        self.val_entryLet = (self.janela.register(self.validaLetra),'%P')
         
 #######   Função pro número do telefone já sair bonitinho, mas não deu certo tenho que ver ainda #####
-def validaTel(self, padrao, tel, validarNum):
+    def validaTel(self, padrao, tel, validarNum):
         padrao = '([0-9]{2,3})?([0-9]{2})([0-9]{4,5})([0-9]{4})'
 
         tel = re.search(padrao, validarNum())
@@ -129,6 +129,7 @@ class Funcs():
     def limpa_tela(self):
         self.entry_codigo.delete(0, END)
         self.entry_nome.delete(0, END)
+        self.entry_cpf.delete(0, END)
         self.entry_cep.delete(0, END)
         self.entry_cidade.delete(0, END)
         self.entry_nibge.delete(0, END)
@@ -257,9 +258,10 @@ class Funcs():
         self.desconecta_bd()   
         
 
-class App(Funcs, Relatorios):
+class App(Funcs, Relatorios, Validadores):
     def __init__(self):
         self.janela = janela
+        self.valida_entrada() #chamando a função valida a entrada
         self.tela() #chamando a funçao tela
         self.frames_tela() #chamando a funçao frames tela
         self.widgets_frame1() #chamando a funçao widgets tela
@@ -295,7 +297,7 @@ class App(Funcs, Relatorios):
 
         #Criando o Botão Buscar
         self.btn_buscar = Button(self.frame_1, text='Buscar', bd=2, bg='#107db2', fg='white',
-                                font=('verdana', 8, 'bold'))
+                                font=('verdana', 8, 'bold'), command=self.busca_cliente)
         self.btn_buscar.place(relx=0.7, rely=0.25, relwidth=0.1, relheight=0.15)
 
         #Criando o Botão Salvar
@@ -326,21 +328,21 @@ class App(Funcs, Relatorios):
         self.lb_nome = Label(self.frame_1, text='Nome', bg='#dfe3ee', fg='#107db2')
         self.lb_nome.place(relx=0.05, rely=0.27)
 
-        self.entry_nome = Entry(self.frame_1)
+        self.entry_nome = Entry(self.frame_1, validate='key', validatecommand=self.val_entryLet)
         self.entry_nome.place(relx=0.05, rely=0.34, relwidth=0.3)
 
         #Criando Label e Entry Nome
         self.lb_cpf = Label(self.frame_1, text='CPF', bg='#dfe3ee', fg='#107db2')
         self.lb_cpf.place(relx=0.38, rely=0.27)
 
-        self.entry_cpf = Entry(self.frame_1)
+        self.entry_cpf = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
         self.entry_cpf.place(relx=0.38, rely=0.34, relwidth=0.2)
 
         #Criando Label e Entry CEP
         self.lb_cep = Label(self.frame_1, text='CEP', bg='#dfe3ee', fg='#107db2')
         self.lb_cep.place(relx=0.05, rely=0.41)
 
-        self.entry_cep = Entry(self.frame_1)
+        self.entry_cep = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
         self.entry_cep.place(relx=0.05, rely=0.47, relwidth=0.1)
 
         #Criando Label e Entry Cidade
@@ -382,7 +384,7 @@ class App(Funcs, Relatorios):
         self.lb_telefone = Label(self.frame_1, text='Telefone', bg='#dfe3ee', fg='#107db2')
         self.lb_telefone.place(relx=0.51, rely=0.56)
 
-        self.entry_telefone = Entry(self.frame_1)
+        self.entry_telefone = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
         self.entry_telefone.place(relx=0.51, rely=0.63, relwidth=0.2)
 
     def lista_frame2(self):
