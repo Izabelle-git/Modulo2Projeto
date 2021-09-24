@@ -1,7 +1,10 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import sqlite3
 import re
+import pycep_correios
+from pycep_correios import viacep
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.pdfbase import pdfmetrics
@@ -23,10 +26,11 @@ class Relatorios():
         self.cpfRel = self.entry_cpf.get()
         self.cepRel = self.entry_cep.get()
         self.cidadeRel = self.entry_cidade.get()
-        self.nibge = self.entry_nibge.get()
-        self.uf = self.entry_uf.get()
-        self.logradouro = self.entry_logradouro.get()
-        self.numero = self.entry_numero.get()
+        self.complementoRel = self.entry_complemento.get()
+        self.ufRel = self.entry_uf.get()
+        self.bairroRel = self.entry_bairro.get()
+        self.logradouroRel = self.entry_logradouro.get()
+        self.numeroRel = self.entry_numero.get()
         self.telefoneRel = self.entry_telefone.get()
 
         self.c.setFont("Helvetica-Bold", 24)
@@ -39,19 +43,26 @@ class Relatorios():
         self.c.drawString(50, 660, 'CPF: ')
         self.c.drawString(50, 640, 'CEP: ')
         self.c.drawString(50, 620, 'Cidade: ')
-        self.c.drawString(50, 600, 'Nº IBGE: ')
+        self.c.drawString(50, 600, 'Complemento: ')
         self.c.drawString(50, 580, 'UF: ')
-        self.c.drawString(50, 560, 'Logradouro: ')
-        self.c.drawString(50, 540, 'Número: ')
-        self.c.drawString(50, 520, 'Telefone: ')
+        self.c.drawString(50, 560, 'Bairro: ')
+        self.c.drawString(50, 540, 'Logradouro: ')
+        self.c.drawString(50, 520, 'Número: ')
+        self.c.drawString(50, 500, 'Telefone: ')
 
         #Chamando os dados de acordo com a entry do banco
         self.c.setFont("Helvetica-Bold", 14)
         self.c.drawString(105, 700, self.codigoRel)
         self.c.drawString(100, 680, self.nomeRel)
-        self.c.drawString(110, 640, self.cidadeRel)
-        self.c.drawString(120, 660, self.telefoneRel)
-        ###LEMBRAR DE ADICIONAR MAIS COISA AQUI
+        self.c.drawString(100, 660, self.cpfRel)
+        self.c.drawString(100, 640, self.cepRel)
+        self.c.drawString(110, 620, self.cidadeRel)
+        self.c.drawString(100, 600, self.complementoRel)
+        self.c.drawString(100, 580, self.ufRel)
+        self.c.drawString(100, 560, self.bairroRel)
+        self.c.drawString(100, 540, self.logradouroRel)
+        self.c.drawString(100, 520, self.numeroRel)
+        self.c.drawString(120, 500, self.telefoneRel)
 
         #Um detalhe a mais para deixa a ficha bonita
         self.c.rect(185, 780, 215, 35, fill=False, stroke=True)
@@ -131,8 +142,9 @@ class Funcs():
         self.entry_nome.delete(0, END)
         self.entry_cep.delete(0, END)
         self.entry_cidade.delete(0, END)
-        self.entry_nibge.delete(0, END)
+        self.entry_complemento.delete(0, END)
         self.entry_uf.delete(0, END)
+        self.entry_bairro.delete(0, END)
         self.entry_logradouro.delete(0, END)
         self.entry_numero.delete(0, END)
         self.entry_telefone.delete(0, END)
@@ -158,12 +170,13 @@ class Funcs():
              nome_cliente CHAR(40) NOT NULL,
              cpf INTEGER(11) NOT NULL,
              cep INTEGER(9),
-             ibge INTEGER(7),
+             cidade CHAR(40),
              uf CHAR(2) NOT NULL,
+             bairro CHAR(20),
              logradouro CHAR(40),
+             complemento CHAR(40),
              numero INTEGER(5),
-             telefone INTEGER(20),
-             cidade CHAR(40)
+             telefone INTEGER(20)
             );
         """)
         #Validar a informação no banco de dados
@@ -178,8 +191,9 @@ class Funcs():
         self.cpf = self.entry_cpf.get()
         self.cep = self.entry_cep.get()
         self.cidade = self.entry_cidade.get()
-        self.nibge = self.entry_nibge.get()
+        self.complemento = self.entry_complemento.get()
         self.uf = self.entry_uf.get()
+        self.bairro = self.entry_bairro.get()
         self.logradouro = self.entry_logradouro.get()
         self.numero = self.entry_numero.get()
         self.telefone = self.entry_telefone.get()   
@@ -187,39 +201,53 @@ class Funcs():
 #Função para adiconar dados do cliente    
     def add_cliente(self):
         self.dados()
-        self.conecta_bd()
-        self.cursor.execute(""" INSERT INTO clientes(nome_cliente, cpf, cep, ibge, uf, logradouro, numero, telefone, cidade)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""", (self.nome, self.cpf, self.cep, self.nibge, self.uf, self.logradouro, self.numero, self.telefone, self.cidade))
-        self.conn.commit()
-        self.desconecta_bd()
-        self.select_lista()
-        self.limpa_tela()       
+        #Adicionando mensagem de erro para campos OBRIGATORIOS
+        if self.entry_nome.get() == "":
+            msg = "Campo Nome é obrigatorio"
+            messagebox.showinfo("Erro de cadastro", msg)
+        elif self.entry_cpf.get() == "":
+            msg = "Campo CPF é obrigatorio"
+            messagebox.showinfo("Erro de cadastro", msg)
+        elif self.entry_uf.get() == "":
+            msg = "Campo UF é obrigatorio"
+            messagebox.showinfo("Erro de cadastro", msg)
+        else:    
+            self.conecta_bd()
+
+            self.cursor.execute(""" INSERT INTO clientes(nome_cliente, cpf, cep, cidade, uf, bairro, logradouro, complemento, numero, telefone)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""", (self.nome, self.cpf, self.cep, self.cidade, self.uf, self.bairro, self.logradouro, self.complemento, self.numero, self.telefone))
+            self.conn.commit()
+            self.desconecta_bd()
+            self.select_lista()
+            self.limpa_tela()       
 
     def select_lista(self):
         self.listaCli.delete(*self.listaCli.get_children())
         self.conecta_bd()
-        lista = self.cursor.execute(""" SELECT cod, nome_cliente, cpf, cep, ibge, uf, logradouro, numero, telefone, cidade FROM clientes
+        lista = self.cursor.execute(""" SELECT cod, nome_cliente, cpf, cep, cidade, uf, bairro, logradouro, complemento, numero, telefone FROM clientes
             ORDER BY nome_cliente ASC; """)
         for i in lista:
             self.listaCli.insert("", END, values=i) 
         self.desconecta_bd()   
+
 #Função para Duplo Click
     def OnDoubleClick(self, event):  
         self.limpa_tela()
         self.listaCli.selection()
 
         for n in self.listaCli.selection():
-            col1, col2, col3, col4, col5, col6, col7, col8, col9, col10 = self.listaCli.item(n, 'values')
+            col1, col2, col3, col4, col5, col6, col7, col8, col9, col10, col11 = self.listaCli.item(n, 'values')
             self.entry_codigo.insert(END, col1)
             self.entry_nome.insert(END, col2)
             self.entry_cpf.insert(END, col3)
             self.entry_cep.insert(END, col4)
             self.entry_cidade.insert(END, col5)
-            self.entry_nibge.insert(END, col6)
+            self.entry_complemento.insert(END, col6)
             self.entry_uf.insert(END, col7)
-            self.entry_logradouro.insert(END, col8)
-            self.entry_numero.insert(END, col9)
-            self.entry_telefone.insert(END, col10)
+            self.entry_bairro.insert(END, col8)
+            self.entry_logradouro.insert(END, col9)
+            self.entry_numero.insert(END, col10)
+            self.entry_telefone.insert(END, col11)
 
     def deleta_cliente(self):
         self.dados()
@@ -233,7 +261,7 @@ class Funcs():
     def altera_cliente(self):
         self.dados()
         self.conecta_bd()
-        self.cursor.execute(""" UPDATE clientes SET nome_cliente = ?, cpf = ?, cep = ?, ibge = ?, uf = ?, logradouro = ?, numero = ?, telefone = ?, cidade = ? WHERE cod = ? """, (self.nome, self.cpf, self.cep, self.nibge, self.uf, self.logradouro, self.numero, self.telefone, self.cidade))
+        self.cursor.execute(""" UPDATE clientes SET nome_cliente = ?, cpf = ?, cep = ?, cidade = ?, uf = ?, bairro = ?, logradouro = ?, complemento = ?, numero = ?, telefone = ? WHERE cod = ? """, (self.nome, self.cpf, self.cep, self.cidade, self.uf, self.bairro, self.logradouro, self.complemento, self.numero, self.telefone))
         self.conn.commit()
         self.desconecta_bd()
         self.select_lista()
@@ -269,13 +297,31 @@ class App(Funcs, Relatorios):
         self.menus() #chamando a função mostrar Menu
         janela.mainloop()
 
+#Função para pegar informações de CEP do correio
+    def correios_cep(self):
+        self.entry_cidade.delete(0, END)
+        self.entry_logradouro.delete(0, END)
+        self.entry_uf.delete(0, END)
+        self.entry_complemento.delete(0, END)
+        self.entry_bairro.delete(0, END)
+        
+        zipcode = self.entry_cep.get()
+        dados_cep = pycep_correios.get_address_from_cep(zipcode)
+        print(dados_cep)
+
+        self.entry_cidade.insert(END, dados_cep['cidade'])
+        self.entry_logradouro.insert(END, dados_cep['logradouro'])
+        self.entry_uf.insert(END, dados_cep['uf']) 
+        self.entry_complemento.insert(END, dados_cep['complemento'])
+        self.entry_bairro.insert(END, dados_cep['bairro'])   
+
     def tela(self):
         self.janela.title('Cadastro de Clientes') #titulo
         self.janela.configure(background='#1e3743') #Cor de fundo
-        self.janela.geometry('1000x800') #tamanho da tela
+        self.janela.geometry('1200x1000') #tamanho da tela
         self.janela.resizable(True, True) #tamanho ajustável
-        self.janela.maxsize(width=1100, height=900) #tamanho máximo
-        self.janela.minsize(width=500, height=400) #tamanho mínimo
+        self.janela.maxsize(width=1200, height=1000) #tamanho máximo
+        self.janela.minsize(width=800, height=600) #tamanho mínimo
 
     def frames_tela(self):
         #Criando o Frame 1
@@ -285,7 +331,8 @@ class App(Funcs, Relatorios):
         #Criando o frame 2
         self.frame_2 = Frame(self.janela, bd=4, bg='#dfe3ee', highlightbackground='#759fe6', highlightthickness=3)
         self.frame_2.place(relx=0.02, rely=0.5, relwidth=0.96, relheight=0.46)    
-      
+
+
     def widgets_frame1(self):
     ##Criando Botões##  
         #Criando o Botão Limpar
@@ -314,7 +361,17 @@ class App(Funcs, Relatorios):
                                 font=('verdana', 8, 'bold'), command = self.deleta_cliente)
         self.btn_deletar.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
 
-    ##Criando Labels e Entrys##       
+        #Criando o Botão Deletar
+        self.btn_procuracep = Button(self.frame_1, text='DELETAR', bd=2, bg='#DC143C', fg='white',
+                                font=('verdana', 8, 'bold'), command = self.correios_cep)
+        self.btn_procuracep.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
+
+
+    ##Criando Labels e Entrys##
+
+        self.lb_cadastro = Label(self.frame_1, text='Cadastro de Cliente', bg='#dfe3ee', fg='#107db2', font=('arial', 20, 'italic'))
+        self.lb_cadastro.place(relx=0.03, rely=0.04)
+
         #Criando Label e Entry Código
         self.lb_codigo = Label(self.frame_1, text='Código', bg='#dfe3ee', fg='#107db2')
         self.lb_codigo.place(relx=0.0455, rely=0.13)
@@ -337,7 +394,7 @@ class App(Funcs, Relatorios):
         self.entry_cpf.place(relx=0.38, rely=0.34, relwidth=0.2)
 
         #Criando Label e Entry CEP
-        self.lb_cep = Label(self.frame_1, text='CEP', bg='#dfe3ee', fg='#107db2')
+        self.lb_cep = Button(self.frame_1, text='CEP', bg='#dfe3ee', fg='#107db2', command = self.correios_cep)
         self.lb_cep.place(relx=0.05, rely=0.41)
 
         self.entry_cep = Entry(self.frame_1)
@@ -350,12 +407,12 @@ class App(Funcs, Relatorios):
         self.entry_cidade = Entry(self.frame_1)
         self.entry_cidade.place(relx=0.18, rely=0.47, relwidth=0.25)
        
-        #Criando Label e Entry N° IBGE
-        self.lb_nibge = Label(self.frame_1, text='IBGE', bg='#dfe3ee', fg='#107db2')
-        self.lb_nibge.place(relx=0.46, rely=0.41)
+        #Criando Label e Entry Complemento
+        self.lb_complemento = Label(self.frame_1, text='Complemento', bg='#dfe3ee', fg='#107db2')
+        self.lb_complemento.place(relx=0.46, rely=0.41)
 
-        self.entry_nibge = Entry(self.frame_1)
-        self.entry_nibge.place(relx=0.46, rely=0.47, relwidth=0.08)
+        self.entry_complemento = Entry(self.frame_1)
+        self.entry_complemento.place(relx=0.46, rely=0.47, relwidth=0.08)
 
         #Criando Label e Entry Unidade Federativa
         self.lb_uf = Label(self.frame_1, text='UF', bg='#dfe3ee', fg='#107db2')
@@ -363,6 +420,13 @@ class App(Funcs, Relatorios):
 
         self.entry_uf = Entry(self.frame_1)
         self.entry_uf.place(relx=0.57, rely=0.47, relwidth=0.04)
+        
+        #Criando Label e Entry Bairro
+        self.lb_bairro = Label(self.frame_1, text='Bairro', bg='#dfe3ee', fg='#107db2')
+        self.lb_bairro.place(relx=0.57, rely=0.41)
+
+        self.entry_bairro = Entry(self.frame_1)
+        self.entry_bairro.place(relx=0.57, rely=0.47, relwidth=0.04)
         
         #Criando Label e Entry Logradouro
         self.lb_logradouro = Label(self.frame_1, text='Logradouro', bg='#dfe3ee', fg='#107db2')
@@ -387,18 +451,19 @@ class App(Funcs, Relatorios):
 
     def lista_frame2(self):
     ##Criando a tabela Clientes    
-        self.listaCli = ttk.Treeview(self.frame_2, height=3, columns=('col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9', 'col10'))
+        self.listaCli = ttk.Treeview(self.frame_2, height=3, columns=('col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9', 'col10', 'col11'))
         self.listaCli.heading('#0', text='')
         self.listaCli.heading('#1', text='Código')
         self.listaCli.heading('#2', text='Nome')
         self.listaCli.heading('#3', text='CPF')
         self.listaCli.heading('#4', text='CEP')
         self.listaCli.heading('#5', text='Cidade')
-        self.listaCli.heading('#6', text='IBGE')
+        self.listaCli.heading('#6', text='Complemento')
         self.listaCli.heading('#7', text='UF')
-        self.listaCli.heading('#8', text='Logradouro')
-        self.listaCli.heading('#9', text='Número')
-        self.listaCli.heading('#10', text='Telefone')
+        self.listaCli.heading('#8', text='Bairro')
+        self.listaCli.heading('#9', text='Logradouro')
+        self.listaCli.heading('#10', text='Número')
+        self.listaCli.heading('#11', text='Telefone')
 
         self.listaCli.column('#0', width=0)
         self.listaCli.column('#1', width=45)
@@ -409,8 +474,9 @@ class App(Funcs, Relatorios):
         self.listaCli.column('#6', width=70)
         self.listaCli.column('#7', width=50)
         self.listaCli.column('#8', width=125)
-        self.listaCli.column('#9', width=50)
-        self.listaCli.column('#10', width=100)
+        self.listaCli.column('#9', width=125)
+        self.listaCli.column('#10', width=50)
+        self.listaCli.column('#11', width=100)
 
         self.listaCli.place(relx=0.01, rely=0.1, relwidth=0.95, relheight=0.85)
 
@@ -432,10 +498,10 @@ class App(Funcs, Relatorios):
         def Quit(): self.janela.destroy()
 
         menubar.add_cascade(label= "Opções", menu = menu1)
-        menubar.add_cascade(label= "Relatorios", menu = menu2)
+        menubar.add_cascade(label= "Ficha", menu = menu2)
 
         menu1.add_command(label= "Sair", command = Quit)
         menu1.add_command(label= "Limpa Cliente", command = self.limpa_tela)
         
-        menu2.add_command(label= "Clientes", command = self.gerarRelatorio)
+        menu2.add_command(label= "Cliente Específico", command = self.gerarRelatorio)
 App()
