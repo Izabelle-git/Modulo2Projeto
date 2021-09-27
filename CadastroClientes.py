@@ -378,7 +378,7 @@ class App(Funcs, Relatorios, Validadores):
         self.lb_codigo = Label(self.frame_1, text='Código', bg='#dfe3ee', fg='#107db2')
         self.lb_codigo.place(relx=0.0455, rely=0.13)
 
-        self.entry_codigo = Entry(self.frame_1)
+        self.entry_codigo = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
         self.entry_codigo.place(relx=0.05, rely=0.20, relwidth=0.08)
 
         #Criando Label e Entry Nome
@@ -441,7 +441,7 @@ class App(Funcs, Relatorios, Validadores):
         self.lb_numero = Label(self.frame_1, text='Número', bg='#dfe3ee', fg='#107db2')
         self.lb_numero.place(relx=0.38, rely=0.56)
 
-        self.entry_numero = Entry(self.frame_1)
+        self.entry_numero = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
         self.entry_numero.place(relx=0.38, rely=0.63, relwidth=0.1)        
 
         #Criando Label e Entry Telefone
