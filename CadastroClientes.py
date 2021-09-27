@@ -363,93 +363,93 @@ class App(Funcs, Relatorios, Validadores):
                                 font=('verdana', 8, 'bold'), command = self.deleta_cliente)
         self.btn_deletar.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
 
-        #Criando o Botão Deletar
-        self.btn_procuracep = Button(self.frame_1, text='DELETAR', bd=2, bg='#DC143C', fg='white',
-                                font=('verdana', 8, 'bold'), command = self.correios_cep)
-        self.btn_procuracep.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
+        # #Criando o Botão Deletar
+        # self.btn_procuracep = Button(self.frame_1, text='DELETAR', bd=2, bg='#DC143C', fg='white',
+        #                         font=('verdana', 8, 'bold'), command = self.correios_cep)
+        # self.btn_procuracep.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
 
 
     ##Criando Labels e Entrys##
 
-        self.lb_cadastro = Label(self.frame_1, text='Cadastro de Cliente', bg='#dfe3ee', fg='#107db2', font=('arial', 20, 'italic'))
+        self.lb_cadastro = Label(self.frame_1, text='Cadastro de Cliente', bg='#dfe3ee', fg='#107db2', font=('arial', 20, 'italic', 'bold'))
         self.lb_cadastro.place(relx=0.03, rely=0.04)
 
         #Criando Label e Entry Código
-        self.lb_codigo = Label(self.frame_1, text='Código', bg='#dfe3ee', fg='#107db2')
-        self.lb_codigo.place(relx=0.0455, rely=0.13)
+        self.lb_codigo = Label(self.frame_1, text='Código', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_codigo.place(relx=0.0455, rely=0.17)
 
         self.entry_codigo = Entry(self.frame_1)
-        self.entry_codigo.place(relx=0.05, rely=0.20, relwidth=0.08)
+        self.entry_codigo.place(relx=0.05, rely=0.22, relwidth=0.05)
 
         #Criando Label e Entry Nome
-        self.lb_nome = Label(self.frame_1, text='Nome', bg='#dfe3ee', fg='#107db2')
-        self.lb_nome.place(relx=0.05, rely=0.27)
+        self.lb_nome = Label(self.frame_1, text='Nome*', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_nome.place(relx=0.05, rely=0.29)
 
         self.entry_nome = Entry(self.frame_1, validate='key', validatecommand=self.val_entryLet)
-        self.entry_nome.place(relx=0.05, rely=0.34, relwidth=0.3)
+        self.entry_nome.place(relx=0.05, rely=0.34, relwidth=0.27)
 
-        #Criando Label e Entry Nome
-        self.lb_cpf = Label(self.frame_1, text='CPF', bg='#dfe3ee', fg='#107db2')
-        self.lb_cpf.place(relx=0.38, rely=0.27)
+        #Criando Label e Entry CPF
+        self.lb_cpf = Label(self.frame_1, text='CPF*', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_cpf.place(relx=0.34, rely=0.29)
 
         self.entry_cpf = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
-        self.entry_cpf.place(relx=0.38, rely=0.34, relwidth=0.2)
+        self.entry_cpf.place(relx=0.34, rely=0.34, relwidth=0.2)
 
         #Criando Label e Entry CEP
-        self.lb_cep = Button(self.frame_1, text='CEP', bg='#dfe3ee', fg='#107db2', command = self.correios_cep)
-        self.lb_cep.place(relx=0.05, rely=0.41)
+        self.lb_cep = Button(self.frame_1, text='CEP', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'), command = self.correios_cep)
+        self.lb_cep.place(relx=0.05, rely=0.42)
 
         self.entry_cep = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
         self.entry_cep.place(relx=0.05, rely=0.47, relwidth=0.1)
 
         #Criando Label e Entry Cidade
-        self.lb_cidade = Label(self.frame_1, text='Cidade', bg='#dfe3ee', fg='#107db2')
-        self.lb_cidade.place(relx=0.18, rely=0.41)
+        self.lb_cidade = Label(self.frame_1, text='Cidade', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_cidade.place(relx=0.18, rely=0.42)
 
         self.entry_cidade = Entry(self.frame_1)
         self.entry_cidade.place(relx=0.18, rely=0.47, relwidth=0.25)
        
         #Criando Label e Entry Complemento
-        self.lb_complemento = Label(self.frame_1, text='Complemento', bg='#dfe3ee', fg='#107db2')
-        self.lb_complemento.place(relx=0.46, rely=0.41)
+        self.lb_complemento = Label(self.frame_1, text='Complemento', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_complemento.place(relx=0.43, rely=0.55)
 
         self.entry_complemento = Entry(self.frame_1)
-        self.entry_complemento.place(relx=0.46, rely=0.47, relwidth=0.08)
+        self.entry_complemento.place(relx=0.43, rely=0.6, relwidth=0.20)
 
         #Criando Label e Entry Unidade Federativa
-        self.lb_uf = Label(self.frame_1, text='UF', bg='#dfe3ee', fg='#107db2')
-        self.lb_uf.place(relx=0.57, rely=0.41)
+        self.lb_uf = Label(self.frame_1, text='UF*', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_uf.place(relx=0.45, rely=0.42)
 
         self.entry_uf = Entry(self.frame_1)
-        self.entry_uf.place(relx=0.57, rely=0.47, relwidth=0.04)
+        self.entry_uf.place(relx=0.45, rely=0.47, relwidth=0.03)
         
         #Criando Label e Entry Bairro
-        self.lb_bairro = Label(self.frame_1, text='Bairro', bg='#dfe3ee', fg='#107db2')
-        self.lb_bairro.place(relx=0.57, rely=0.41)
+        self.lb_bairro = Label(self.frame_1, text='Bairro', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_bairro.place(relx=0.5, rely=0.42)
 
         self.entry_bairro = Entry(self.frame_1)
-        self.entry_bairro.place(relx=0.57, rely=0.47, relwidth=0.04)
+        self.entry_bairro.place(relx=0.5, rely=0.47, relwidth=0.2)
         
         #Criando Label e Entry Logradouro
-        self.lb_logradouro = Label(self.frame_1, text='Logradouro', bg='#dfe3ee', fg='#107db2')
-        self.lb_logradouro.place(relx=0.05, rely=0.56)
+        self.lb_logradouro = Label(self.frame_1, text='Logradouro', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_logradouro.place(relx=0.05, rely=0.55)
 
         self.entry_logradouro = Entry(self.frame_1)
-        self.entry_logradouro.place(relx=0.05, rely=0.63, relwidth=0.3)
+        self.entry_logradouro.place(relx=0.05, rely=0.6, relwidth=0.25)
 
         #Criando Label e Entry Número
-        self.lb_numero = Label(self.frame_1, text='Número', bg='#dfe3ee', fg='#107db2')
-        self.lb_numero.place(relx=0.38, rely=0.56)
+        self.lb_numero = Label(self.frame_1, text='Número', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_numero.place(relx=0.33, rely=0.55)
 
         self.entry_numero = Entry(self.frame_1)
-        self.entry_numero.place(relx=0.38, rely=0.63, relwidth=0.1)        
+        self.entry_numero.place(relx=0.33, rely=0.6, relwidth=0.08)        
 
         #Criando Label e Entry Telefone
-        self.lb_telefone = Label(self.frame_1, text='Telefone', bg='#dfe3ee', fg='#107db2')
-        self.lb_telefone.place(relx=0.51, rely=0.56)
+        self.lb_telefone = Label(self.frame_1, text='Telefone', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
+        self.lb_telefone.place(relx=0.70, rely=0.55)
 
         self.entry_telefone = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
-        self.entry_telefone.place(relx=0.51, rely=0.63, relwidth=0.2)
+        self.entry_telefone.place(relx=0.70, rely=0.6, relwidth=0.2)
 
     def lista_frame2(self):
     ##Criando a tabela Clientes    
