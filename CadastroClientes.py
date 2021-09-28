@@ -340,28 +340,27 @@ class App(Funcs, Relatorios, Validadores):
         #Criando o Botão Limpar
         self.btn_limpar = Button(self.frame_1, text='Limpar', bd=2, bg='#107db2', fg='white',
                                 font=('verdana', 8, 'bold'), command = self.limpa_tela)
-        self.btn_limpar.place(relx=0.8, rely=0.25, relwidth=0.1, relheight=0.15)
+        self.btn_limpar.place(relx=0.23, rely=0.8, relwidth=0.08, relheight=0.08)
 
         #Criando o Botão Buscar
         self.btn_buscar = Button(self.frame_1, text='Buscar', bd=2, bg='#107db2', fg='white',
                                 font=('verdana', 8, 'bold'), command=self.busca_cliente)
-        self.btn_buscar.place(relx=0.7, rely=0.25, relwidth=0.1, relheight=0.15)
+        self.btn_buscar.place(relx=0.39, rely=0.8, relwidth=0.08, relheight=0.08)
 
         #Criando o Botão Salvar
         self.btn_salvar = Button(self.frame_1, text='SALVAR', bd=2, bg='#00FF7F', fg='white',
-                                font=('verdana', 8, 'bold'), command = self.add_cliente)
-                                
-        self.btn_salvar.place(relx=0.6, rely=0.1, relwidth=0.1, relheight=0.15)
+                                font=('verdana', 8, 'bold'), command = self.add_cliente)                  
+        self.btn_salvar.place(relx=0.03, rely=0.8, relwidth=0.08, relheight=0.08)
 
         #Criando o Botão Alterar
         self.btn_alterar = Button(self.frame_1, text='Alterar', bd=2, bg='#107db2', fg='white',
                                  font=('verdana', 8, 'bold'), command = self.altera_cliente)
-        self.btn_alterar.place(relx=0.8, rely=0.1, relwidth=0.1, relheight=0.15)
+        self.btn_alterar.place(relx=0.31, rely=0.8, relwidth=0.08, relheight=0.08)
 
         #Criando o Botão Deletar
         self.btn_deletar = Button(self.frame_1, text='DELETAR', bd=2, bg='#DC143C', fg='white',
                                 font=('verdana', 8, 'bold'), command = self.deleta_cliente)
-        self.btn_deletar.place(relx=0.7, rely=0.1, relwidth=0.1, relheight=0.15)
+        self.btn_deletar.place(relx=0.13, rely=0.8, relwidth=0.08, relheight=0.08)
 
         # #Criando o Botão Deletar
         # self.btn_procuracep = Button(self.frame_1, text='DELETAR', bd=2, bg='#DC143C', fg='white',
@@ -370,44 +369,52 @@ class App(Funcs, Relatorios, Validadores):
 
 
     ##Criando Labels e Entrys##
-
+        #Criando Label Titulo
         self.lb_cadastro = Label(self.frame_1, text='Cadastro de Cliente', bg='#dfe3ee', fg='#107db2', font=('arial', 20, 'italic', 'bold'))
         self.lb_cadastro.place(relx=0.03, rely=0.04)
 
+        #Criando Label Observação
+        self.lb_cadastro = Label(self.frame_1, text='Campos Obrigatórios*', bg='#dfe3ee', fg='#b2102c', font=('arial', 10, 'italic'))
+        self.lb_cadastro.place(relx=0.26, rely=0.07)
+
+
+        self.lb_cadastro = Label(self.frame_1, text='-'*100, bg='#dfe3ee', fg='#107db2', font=('arial', 10))
+        self.lb_cadastro.place(relx=0.03, rely=0.11)
+
         #Criando Label e Entry Código
         self.lb_codigo = Label(self.frame_1, text='Código', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
-        self.lb_codigo.place(relx=0.0455, rely=0.17)
+        self.lb_codigo.place(relx=0.03, rely=0.17)
 
-        self.entry_codigo = Entry(self.frame_1)
-        self.entry_codigo.place(relx=0.05, rely=0.22, relwidth=0.05)
+        self.entry_codigo = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
+        self.entry_codigo.place(relx=0.03, rely=0.22, relwidth=0.05)
 
         #Criando Label e Entry Nome
         self.lb_nome = Label(self.frame_1, text='Nome*', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
-        self.lb_nome.place(relx=0.05, rely=0.29)
+        self.lb_nome.place(relx=0.03, rely=0.29)
 
         self.entry_nome = Entry(self.frame_1, validate='key', validatecommand=self.val_entryLet)
-        self.entry_nome.place(relx=0.05, rely=0.34, relwidth=0.27)
+        self.entry_nome.place(relx=0.03, rely=0.34, relwidth=0.27)
 
         #Criando Label e Entry CPF
         self.lb_cpf = Label(self.frame_1, text='CPF*', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
-        self.lb_cpf.place(relx=0.34, rely=0.29)
+        self.lb_cpf.place(relx=0.32, rely=0.29)
 
         self.entry_cpf = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
-        self.entry_cpf.place(relx=0.34, rely=0.34, relwidth=0.2)
+        self.entry_cpf.place(relx=0.32, rely=0.34, relwidth=0.2)
 
         #Criando Label e Entry CEP
         self.lb_cep = Button(self.frame_1, text='CEP', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'), command = self.correios_cep)
-        self.lb_cep.place(relx=0.05, rely=0.42)
+        self.lb_cep.place(relx=0.03, rely=0.42)
 
         self.entry_cep = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
-        self.entry_cep.place(relx=0.05, rely=0.47, relwidth=0.1)
+        self.entry_cep.place(relx=0.03, rely=0.47, relwidth=0.1)
 
         #Criando Label e Entry Cidade
         self.lb_cidade = Label(self.frame_1, text='Cidade', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
-        self.lb_cidade.place(relx=0.18, rely=0.42)
+        self.lb_cidade.place(relx=0.16, rely=0.42)
 
         self.entry_cidade = Entry(self.frame_1)
-        self.entry_cidade.place(relx=0.18, rely=0.47, relwidth=0.25)
+        self.entry_cidade.place(relx=0.16, rely=0.47, relwidth=0.25)
        
         #Criando Label e Entry Complemento
         self.lb_complemento = Label(self.frame_1, text='Complemento', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
@@ -432,24 +439,24 @@ class App(Funcs, Relatorios, Validadores):
         
         #Criando Label e Entry Logradouro
         self.lb_logradouro = Label(self.frame_1, text='Logradouro', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
-        self.lb_logradouro.place(relx=0.05, rely=0.55)
+        self.lb_logradouro.place(relx=0.03, rely=0.55)
 
         self.entry_logradouro = Entry(self.frame_1)
-        self.entry_logradouro.place(relx=0.05, rely=0.6, relwidth=0.25)
+        self.entry_logradouro.place(relx=0.03, rely=0.6, relwidth=0.25)
 
         #Criando Label e Entry Número
         self.lb_numero = Label(self.frame_1, text='Número', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
-        self.lb_numero.place(relx=0.33, rely=0.55)
+        self.lb_numero.place(relx=0.31, rely=0.55)
 
-        self.entry_numero = Entry(self.frame_1)
-        self.entry_numero.place(relx=0.33, rely=0.6, relwidth=0.08)        
+        self.entry_numero = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
+        self.entry_numero.place(relx=0.31, rely=0.6, relwidth=0.08)        
 
         #Criando Label e Entry Telefone
         self.lb_telefone = Label(self.frame_1, text='Telefone', bg='#dfe3ee', fg='#107db2', font=('verdana', 10, 'bold'))
-        self.lb_telefone.place(relx=0.70, rely=0.55)
+        self.lb_telefone.place(relx=0.56, rely=0.29)
 
         self.entry_telefone = Entry(self.frame_1, validate='key', validatecommand=self.val_entryNum)
-        self.entry_telefone.place(relx=0.70, rely=0.6, relwidth=0.2)
+        self.entry_telefone.place(relx=0.56, rely=0.34, relwidth=0.2)
 
     def lista_frame2(self):
     ##Criando a tabela Clientes    
