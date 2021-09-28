@@ -262,7 +262,7 @@ class Funcs():
     def altera_cliente(self):
         self.dados()
         self.conecta_bd()
-        self.cursor.execute(""" UPDATE clientes SET nome_cliente = ?, cpf = ?, cep = ?, cidade = ?, uf = ?, bairro = ?, logradouro = ?, complemento = ?, numero = ?, telefone = ? WHERE cod = ? """, (self.nome, self.cpf, self.cep, self.cidade, self.uf, self.bairro, self.logradouro, self.complemento, self.numero, self.telefone))
+        self.cursor.execute(""" UPDATE clientes SET nome_cliente = ?, cpf = ?, cep = ?, cidade = ?, uf = ?, bairro = ?, logradouro = ?, complemento = ?, numero = ?, telefone = ? WHERE cod = ? """, (self.nome, self.cpf, self.cep, self.cidade, self.uf, self.bairro, self.logradouro, self.complemento, self.numero, self.telefone, self.codigo))
         self.conn.commit()
         self.desconecta_bd()
         self.select_lista()
@@ -467,12 +467,13 @@ class App(Funcs, Relatorios, Validadores):
         self.listaCli.heading('#3', text='CPF')
         self.listaCli.heading('#4', text='CEP')
         self.listaCli.heading('#5', text='Cidade')
-        self.listaCli.heading('#6', text='Complemento')
-        self.listaCli.heading('#7', text='UF')
-        self.listaCli.heading('#8', text='Bairro')
-        self.listaCli.heading('#9', text='Logradouro')
+        self.listaCli.heading('#6', text='UF')
+        self.listaCli.heading('#7', text='Bairro')
+        self.listaCli.heading('#8', text='Logradouro')
+        self.listaCli.heading('#9', text='Complemento')
         self.listaCli.heading('#10', text='Número')
         self.listaCli.heading('#11', text='Telefone')
+
 
         self.listaCli.column('#0', width=0)
         self.listaCli.column('#1', width=45)
