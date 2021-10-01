@@ -275,7 +275,7 @@ class Funcs():
         self.entry_nome.insert(END, '%') #Busca (% é coringa por isso coloquei aqui, pra ñ ficar digitando)
         nome = self.entry_nome.get() #Variável pra identificar o nome digitado
         self.cursor.execute(
-            """ SELECT cod, nome_cliente, telefone, cidade FROM clientes
+            """ SELECT cod, nome_cliente, cpf, cep, cidade, uf, bairro, logradouro, complemento, numero, telefone FROM clientes
             WHERE nome_cliente LIKE '%s' ORDER BY nome_cliente ASC""" %nome) 
         #LIKE vai fazer a pesquisa de algo que tenha o que foi digitado, ñ somente o que foi digitado
         #Order By vai fazer a pesquisa em ordem ASC de ascendente
